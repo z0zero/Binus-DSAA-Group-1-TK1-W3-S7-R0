@@ -1,80 +1,252 @@
+import java.util.Scanner;
+
 public class Main {
+    private static Library library;
+    private static Admin admin;
+    private static Member currentMember;
+    private static Scanner scanner;
+    private static boolean isRunning = true;
+    
     public static void main(String[] args) {
-        // Inisialisasi perpustakaan
-        Library library = new Library();
+        // Inisialisasi
+        library = new Library();
+        scanner = new Scanner(System.in);
         
-        // Membuat beberapa buku
-        Book book1 = new Book("Java Programming", "James Gosling");
-        Book book2 = new Book("Data Structures and Algorithms", "Robert Sedgewick");
-        Book book3 = new Book("Clean Code", "Robert C. Martin");
-        Book book4 = new Book("Design Patterns", "Erich Gamma");
-        Book book5 = new Book("Artificial Intelligence", "Stuart Russell");
+        // Membuat admin default
+        admin = new Admin("A001", "John Doe", "john@example.com", "Head Librarian");
         
-        // Membuat Admin
-        Admin admin = new Admin("A001", "John Doe", "john@example.com", "Head Librarian");
-        
-        // Admin menambahkan buku ke perpustakaan
-        System.out.println("=== Admin Menambahkan Buku ===");
-        admin.addBookToLibrary(library, book1);
-        admin.addBookToLibrary(library, book2);
-        admin.addBookToLibrary(library, book3);
-        admin.addBookToLibrary(library, book4);
-        admin.addBookToLibrary(library, book5);
-        
-        // Menampilkan semua buku dalam perpustakaan
-        library.displayAllBooks();
-        
-        // Membuat Member
+        // Membuat beberapa member default
         Member member1 = new Member("M001", "Alice Smith", "alice@example.com", "Gold");
         Member member2 = new Member("M002", "Bob Johnson", "bob@example.com", "Silver");
         
-        // Penggunaan polymorphism dengan metode interact
-        System.out.println("\n=== Demonstrasi Polymorphism ===");
-        User[] users = {admin, member1, member2};
+        // Menambahkan beberapa buku default
+        library.addBook(new Book("Java Programming", "James Gosling"));
+        library.addBook(new Book("Data Structures and Algorithms", "Robert Sedgewick"));
+        library.addBook(new Book("Clean Code", "Robert C. Martin"));
+        library.addBook(new Book("Design Patterns", "Erich Gamma"));
+        library.addBook(new Book("Artificial Intelligence", "Stuart Russell"));
         
-        for (User user : users) {
-            user.interact(library, book1);
+        System.out.println("=== SELAMAT DATANG DI SISTEM MANAJEMEN PERPUSTAKAAN ===");
+        
+        while (isRunning) {
+            showMainMenu();
+            int choice = getUserChoice();
+            
+            processMainMenu(choice);
         }
         
-        // Member meminjam buku
-        System.out.println("\n=== Member Meminjam Buku ===");
-        member1.borrowBook(library, "Java Programming");
-        member1.borrowBook(library, "Clean Code");
-        member2.borrowBook(library, "Design Patterns");
+        scanner.close();
+        System.out.println("Terima kasih telah menggunakan Sistem Manajemen Perpustakaan. Sampai jumpa!");
+    }
+    
+    private static void showMainMenu() {
+        System.out.println("\n=== MENU UTAMA ===");
+        System.out.println("1. Login sebagai Admin");
+        System.out.println("2. Login sebagai Member");
+        System.out.println("3. Lihat Semua Buku");
+        System.out.println("4. Cari Buku berdasarkan Judul");
+        System.out.println("5. Keluar");
+        System.out.print("Pilihan Anda: ");
+    }
+    
+    private static int getUserChoice() {
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return -1; // Invalid input
+        }
+    }
+    
+    private static void processMainMenu(int choice) {
+        switch (choice) {
+            case 1:
+                adminLogin();
+                break;
+            case 2:
+                memberLogin();
+                break;
+            case 3:
+                library.displayAllBooks();
+                break;
+            case 4:
+                searchBook();
+                break;
+            case 5:
+                isRunning = false;
+                break;
+            default:
+                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+        }
+    }
+    
+    private static void adminLogin() {
+        System.out.println("\n=== LOGIN ADMIN ===");
+        System.out.print("Masukkan ID Admin (tekan Enter untuk menggunakan admin default): ");
+        String adminId = scanner.nextLine();
         
-        // Menampilkan buku yang dipinjam oleh member
-        member1.displayBorrowedBooks();
-        member2.displayBorrowedBooks();
+        // Untuk demo, kita gunakan admin default jika input kosong
+        if (adminId.isEmpty() || adminId.equals("A001")) {
+            System.out.println("Login berhasil sebagai Admin: " + admin.getName());
+            showAdminMenu();
+        } else {
+            System.out.println("ID Admin tidak valid!");
+        }
+    }
+    
+    private static void showAdminMenu() {
+        boolean adminSession = true;
         
-        // Menampilkan buku yang tersedia
+        while (adminSession) {
+            System.out.println("\n=== MENU ADMIN ===");
+            System.out.println("1. Tambah Buku Baru");
+            System.out.println("2. Hapus Buku");
+            System.out.println("3. Lihat Semua Buku");
+            System.out.println("4. Lihat Buku yang Tersedia");
+            System.out.println("5. Cari Buku berdasarkan Judul");
+            System.out.println("6. Kembali ke Menu Utama");
+            System.out.print("Pilihan Anda: ");
+            
+            int choice = getUserChoice();
+            
+            switch (choice) {
+                case 1:
+                    addNewBook();
+                    break;
+                case 2:
+                    removeBook();
+                    break;
+                case 3:
+                    library.displayAllBooks();
+                    break;
+                case 4:
+                    library.displayAvailableBooks();
+                    break;
+                case 5:
+                    searchBook();
+                    break;
+                case 6:
+                    adminSession = false;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+            }
+        }
+    }
+    
+    private static void addNewBook() {
+        System.out.println("\n=== TAMBAH BUKU BARU ===");
+        System.out.print("Masukkan judul buku: ");
+        String title = scanner.nextLine();
+        
+        System.out.print("Masukkan nama pengarang: ");
+        String author = scanner.nextLine();
+        
+        Book newBook = new Book(title, author);
+        admin.addBookToLibrary(library, newBook);
+    }
+    
+    private static void removeBook() {
+        System.out.println("\n=== HAPUS BUKU ===");
+        System.out.print("Masukkan judul buku yang ingin dihapus: ");
+        String title = scanner.nextLine();
+        
+        admin.removeBookFromLibrary(library, title);
+    }
+    
+    private static void memberLogin() {
+        System.out.println("\n=== LOGIN MEMBER ===");
+        System.out.print("Masukkan ID Member (M001 untuk Alice, M002 untuk Bob): ");
+        String memberId = scanner.nextLine();
+        
+        // Untuk demo, kita hanya punya dua member
+        if (memberId.equals("M001")) {
+            currentMember = new Member("M001", "Alice Smith", "alice@example.com", "Gold");
+            System.out.println("Login berhasil sebagai Member: " + currentMember.getName());
+            showMemberMenu();
+        } else if (memberId.equals("M002")) {
+            currentMember = new Member("M002", "Bob Johnson", "bob@example.com", "Silver");
+            System.out.println("Login berhasil sebagai Member: " + currentMember.getName());
+            showMemberMenu();
+        } else {
+            System.out.println("ID Member tidak valid!");
+        }
+    }
+    
+    private static void showMemberMenu() {
+        boolean memberSession = true;
+        
+        while (memberSession) {
+            System.out.println("\n=== MENU MEMBER ===");
+            System.out.println("1. Lihat Semua Buku");
+            System.out.println("2. Lihat Buku yang Tersedia");
+            System.out.println("3. Cari Buku berdasarkan Judul");
+            System.out.println("4. Pinjam Buku");
+            System.out.println("5. Kembalikan Buku");
+            System.out.println("6. Lihat Buku yang Dipinjam");
+            System.out.println("7. Kembali ke Menu Utama");
+            System.out.print("Pilihan Anda: ");
+            
+            int choice = getUserChoice();
+            
+            switch (choice) {
+                case 1:
+                    library.displayAllBooks();
+                    break;
+                case 2:
+                    library.displayAvailableBooks();
+                    break;
+                case 3:
+                    searchBook();
+                    break;
+                case 4:
+                    borrowBook();
+                    break;
+                case 5:
+                    returnBook();
+                    break;
+                case 6:
+                    currentMember.displayBorrowedBooks();
+                    break;
+                case 7:
+                    memberSession = false;
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+            }
+        }
+    }
+    
+    private static void borrowBook() {
+        System.out.println("\n=== PINJAM BUKU ===");
         library.displayAvailableBooks();
         
-        // Member mengembalikan buku
-        System.out.println("\n=== Member Mengembalikan Buku ===");
-        member1.returnBook(library, "Java Programming");
+        System.out.print("Masukkan judul buku yang ingin dipinjam: ");
+        String title = scanner.nextLine();
         
-        // Menampilkan buku yang dipinjam oleh member setelah pengembalian
-        member1.displayBorrowedBooks();
+        currentMember.borrowBook(library, title);
+    }
+    
+    private static void returnBook() {
+        System.out.println("\n=== KEMBALIKAN BUKU ===");
+        currentMember.displayBorrowedBooks();
         
-        // Menampilkan buku yang tersedia setelah pengembalian
-        library.displayAvailableBooks();
+        System.out.print("Masukkan judul buku yang ingin dikembalikan: ");
+        String title = scanner.nextLine();
         
-        // Admin mencari buku
-        System.out.println("\n=== Pencarian Buku oleh Admin ===");
-        String searchTitle = "Clean Code";
-        Book foundBook = library.findBook(searchTitle);
+        currentMember.returnBook(library, title);
+    }
+    
+    private static void searchBook() {
+        System.out.println("\n=== CARI BUKU ===");
+        System.out.print("Masukkan judul buku yang ingin dicari: ");
+        String title = scanner.nextLine();
+        
+        Book foundBook = library.findBook(title);
         
         if (foundBook != null) {
             System.out.println("Buku ditemukan: " + foundBook);
         } else {
-            System.out.println("Buku dengan judul '" + searchTitle + "' tidak ditemukan.");
+            System.out.println("Buku dengan judul '" + title + "' tidak ditemukan.");
         }
-        
-        // Admin menghapus buku
-        System.out.println("\n=== Admin Menghapus Buku ===");
-        admin.removeBookFromLibrary(library, "Artificial Intelligence");
-        
-        // Menampilkan semua buku setelah penghapusan
-        library.displayAllBooks();
     }
 } 
