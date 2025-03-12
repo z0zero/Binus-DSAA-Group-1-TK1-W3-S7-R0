@@ -1,0 +1,52 @@
++------------------+     +---------------------+
+|      User        |     |       Book         |
++------------------+     +---------------------+
+| - userId: String |     | - title: String     |
+| - name: String   |     | - author: String    |
+| - email: String  |     | - available: boolean|
++------------------+     +---------------------+
+| + getUserId()    |     | + getTitle()        |
+| + getName()      |     | + getAuthor()       |
+| + setName()      |     | + isAvailable()     |
+| + getEmail()     |     | + setAvailable()    |
+| + setEmail()     |     | + borrowBook()      |
+| + interact()     |<----| + returnBook()      |
+| + toString()     |     | + toString()        |
++------------------+     +---------------------+
+        ^                          ^
+        |                          |
++-------+--------+     +-----------+-----------+
+|                |     |                       |
+|                |     |                       |
++----------------+     +-----------------------+
+|     Admin      |     |      Library          |
++----------------+     +-----------------------+
+| - adminRole    |     | - books: Book[]       |
++----------------+     | - bookCount: int      |
+| + getAdminRole()|    | - MAX_BOOKS: int      |
+| + setAdminRole()|    +-----------------------+
+| + interact()    |    | + addBook()           |
+| + addBook()     |<---| + removeBook()        |
+| + removeBook()  |    | + findBook()          |
+| + toString()    |    | + displayAvailableBooks()|
++----------------+     | + displayAllBooks()   |
+        ^              | + borrowBook()        |
+        |              | + returnBook()        |
++-------+--------+     +-----------------------+
+|                |               ^
+|                |               |
++----------------+     +---------+-----------+
+|     Member     |     |                     |
++----------------+     |                     |
+| - membership   |-----+---------------------+
+| - borrowedBooks|
+| - borrowCount  |
++----------------+
+| + getMembership()|
+| + setMembership()|
+| + interact()    |
+| + borrowBook()  |
+| + returnBook()  |
+| + displayBorrowedBooks()|
+| + toString()    |
++----------------+ 
