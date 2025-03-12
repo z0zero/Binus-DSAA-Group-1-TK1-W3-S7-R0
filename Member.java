@@ -1,14 +1,14 @@
+import java.util.LinkedList;
+
 public class Member extends User {
     private String membershipLevel;
-    private Book[] borrowedBooks;
-    private int borrowCount;
+    private LinkedList<Book> borrowedBooks;
     private static final int MAX_BORROW = 5;
     
     public Member(String userId, String name, String email, String membershipLevel) {
         super(userId, name, email);
         this.membershipLevel = membershipLevel;
-        this.borrowedBooks = new Book[MAX_BORROW];
-        this.borrowCount = 0;
+        this.borrowedBooks = new LinkedList<>();
     }
     
     public String getMembershipLevel() {
@@ -27,7 +27,7 @@ public class Member extends User {
     
     // Member memiliki kemampuan khusus untuk meminjam buku
     public void borrowBook(Library library, String title) {
-        if (borrowCount >= MAX_BORROW) {
+        if (borrowedBooks.size() >= MAX_BORROW) {
             System.out.println("Anggota " + getName() + " telah mencapai batas maksimum peminjaman.");
             return;
         }
@@ -35,8 +35,7 @@ public class Member extends User {
         Book book = library.findBook(title);
         if (book != null && book.isAvailable()) {
             if (library.borrowBook(title)) {
-                borrowedBooks[borrowCount] = book;
-                borrowCount++;
+                borrowedBooks.add(book);
                 System.out.println("Anggota " + getName() + " berhasil meminjam buku: " + title);
             }
         } else {
@@ -53,24 +52,19 @@ public class Member extends User {
         Book book = library.findBook(title);
         if (book != null && !book.isAvailable()) {
             boolean hasBook = false;
-            int bookIndex = -1;
+            Book bookToRemove = null;
             
-            for (int i = 0; i < borrowCount; i++) {
-                if (borrowedBooks[i].getTitle().equalsIgnoreCase(title)) {
+            for (Book borrowedBook : borrowedBooks) {
+                if (borrowedBook.getTitle().equalsIgnoreCase(title)) {
                     hasBook = true;
-                    bookIndex = i;
+                    bookToRemove = borrowedBook;
                     break;
                 }
             }
             
             if (hasBook) {
                 if (library.returnBook(title)) {
-                    // Menggeser semua buku setelah buku yang dikembalikan
-                    for (int j = bookIndex; j < borrowCount - 1; j++) {
-                        borrowedBooks[j] = borrowedBooks[j + 1];
-                    }
-                    borrowedBooks[borrowCount - 1] = null;
-                    borrowCount--;
+                    borrowedBooks.remove(bookToRemove);
                     System.out.println("Anggota " + getName() + " berhasil mengembalikan buku: " + title);
                 }
             } else {
@@ -88,13 +82,13 @@ public class Member extends User {
     // Menampilkan buku yang dipinjam oleh anggota
     public void displayBorrowedBooks() {
         System.out.println("\n=== Buku yang Dipinjam oleh " + getName() + " ===");
-        if (borrowCount == 0) {
+        if (borrowedBooks.isEmpty()) {
             System.out.println("Tidak ada buku yang dipinjam.");
             return;
         }
         
-        for (int i = 0; i < borrowCount; i++) {
-            System.out.println(borrowedBooks[i]);
+        for (Book book : borrowedBooks) {
+            System.out.println(book);
         }
     }
     

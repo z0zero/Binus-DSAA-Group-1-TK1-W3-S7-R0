@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.List;
 
 public class Main {
     private static Library library;
@@ -238,15 +239,26 @@ public class Main {
     
     private static void searchBook() {
         System.out.println("\n=== CARI BUKU ===");
-        System.out.print("Masukkan judul buku yang ingin dicari: ");
-        String title = scanner.nextLine();
+        System.out.print("Masukkan judul atau kata kunci buku yang ingin dicari: ");
+        String keyword = scanner.nextLine();
         
-        Book foundBook = library.findBook(title);
+        // Coba cari dengan judul lengkap dulu
+        Book exactBook = library.findBook(keyword);
         
-        if (foundBook != null) {
-            System.out.println("Buku ditemukan: " + foundBook);
+        if (exactBook != null) {
+            System.out.println("Buku dengan judul persis ditemukan: " + exactBook);
         } else {
-            System.out.println("Buku dengan judul '" + title + "' tidak ditemukan.");
+            // Jika tidak ditemukan, cari dengan kata kunci
+            List<Book> matchingBooks = library.findBooksByKeyword(keyword);
+            
+            if (!matchingBooks.isEmpty()) {
+                System.out.println("Buku yang mengandung kata kunci '" + keyword + "':");
+                for (Book book : matchingBooks) {
+                    System.out.println("- " + book);
+                }
+            } else {
+                System.out.println("Tidak ada buku yang mengandung kata kunci '" + keyword + "'.");
+            }
         }
     }
 } 
