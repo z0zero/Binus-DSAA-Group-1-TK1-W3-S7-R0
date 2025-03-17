@@ -115,30 +115,34 @@ public class Library {
     // Menampilkan semua buku dalam perpustakaan
     public void displayAllBooks() {
         System.out.println("\n=== Daftar Semua Buku di Perpustakaan ===");
-        if (books.isEmpty()) {
+        Book[] allBooks = books.toArray(new Book[0]);
+        if (allBooks.length == 0) {
             System.out.println("Perpustakaan kosong.");
-            return;
-        }
-        
-        for (Book book : books) {
-            System.out.println(book);
+        } else {
+            for (Book book : allBooks) {
+                System.out.println(book);
+            }
         }
     }
     
     // Method untuk meminjam buku
     public boolean borrowBook(String title) {
-        Book book = findBook(title);
-        if (book != null && book.isAvailable()) {
-            return book.borrowBook();
+        Book[] bookArray = books.toArray(new Book[0]);
+        for (Book book : bookArray) {
+            if (book.getTitle().equalsIgnoreCase(title) && book.isAvailable()) {
+                return book.borrowBook();
+            }
         }
         return false;
     }
     
     // Method untuk mengembalikan buku
     public boolean returnBook(String title) {
-        Book book = findBook(title);
-        if (book != null && !book.isAvailable()) {
-            return book.returnBook();
+        Book[] bookArray = books.toArray(new Book[0]);
+        for (Book book : bookArray) {
+            if (book.getTitle().equalsIgnoreCase(title) && !book.isAvailable()) {
+                return book.returnBook();
+            }
         }
         return false;
     }
